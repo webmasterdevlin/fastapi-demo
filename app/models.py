@@ -1,7 +1,7 @@
 from sqlalchemy import Integer, String, Column, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 
-from .database import Base
+from .database import Base, engine
 
 
 class User(Base):
@@ -23,3 +23,5 @@ class Task(Base):
 
     owner = relationship("User", back_populates="tasks")
 
+
+Base.metadata.create_all(bind=engine)

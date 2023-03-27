@@ -1,11 +1,9 @@
-import httpx
-import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from app import crud, main, models, schemas, database
+from app import main, database
 
 # Set up a test database and session
 TEST_DATABASE_URL = "sqlite:///./test_todo.db"
@@ -24,7 +22,7 @@ def get_test_db():
 
 
 # Override the get_db function in the app
-main.app.dependency_overrides[main.get_db] = get_test_db
+main.app.dependency_overrides[database.get_db] = get_test_db
 
 client = TestClient(main.app)
 
