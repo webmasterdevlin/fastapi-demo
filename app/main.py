@@ -1,8 +1,10 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm.session import Session
-from . import crud, schemas, database
 
-app = FastAPI()
+from app import database, schemas, crud
+from app.schemas import TaskUpdate
+
+app = FastAPI(title="Todo App Demo", version="0.1.0")
 
 
 def get_db():
@@ -28,12 +30,15 @@ def read_user_tasks(user_id: int, db: Session = Depends(get_db)):
 
 @app.post("/users/{user_id}/tasks", response_model=schemas.TaskOut)
 def create_task_for_user(user_id: int, task: schemas.TaskCreate, db: Session = Depends(get_db)):
-    return crud.create_task_for_user(db=db, task=task, user_id=user_id)
+    db_user = crud.get_user(db, user_id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return crud.create_task_for_user(db, task=task, user_id=user_id)
 
 
 @app.put("/tasks/{task_id}", response_model=schemas.TaskOut)
-def update_task(task_id: int, completed: bool, db: Session = Depends(get_db)):
-    db_task = crud.update_task(db, task_id=task_id, completed=completed)
+def update_task(task_id: int, task_update: TaskUpdate, db: Session = Depends(get_db)):
+    db_task = crud.update_task(db, task_id=task_id, completed=task_update.completed)
     if db_task is None:
         raise HTTPException(status_code=404, detail="Task not found")
     return db_task

@@ -36,3 +36,7 @@ class TaskOut(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class TaskUpdate(BaseModel):
+    completed: bool
